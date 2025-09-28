@@ -309,7 +309,10 @@ where
 
     /// Update the environment to a new time
     #[cfg(feature = "async")]
-    pub async fn update_to_time(&mut self, new_time: SimulationTime) -> Result<Vec<EnvironmentChange>> {
+    pub async fn update_to_time(
+        &mut self,
+        new_time: SimulationTime,
+    ) -> Result<Vec<EnvironmentChange>> {
         let mut all_changes = Vec::new();
 
         // Update physical assets
@@ -483,7 +486,12 @@ mod tests {
             Ok(())
         }
 
-        fn connect_agents(&mut self, _agent1: AgentId, _agent2: AgentId, _strength: f64) -> Result<()> {
+        fn connect_agents(
+            &mut self,
+            _agent1: AgentId,
+            _agent2: AgentId,
+            _strength: f64,
+        ) -> Result<()> {
             Ok(())
         }
 
@@ -574,7 +582,10 @@ mod tests {
     #[cfg_attr(feature = "async", async_trait)]
     impl ExogenousProcess for TestExogenousProcess {
         #[cfg(feature = "async")]
-        async fn update_environment(&self, _time: SimulationTime) -> Result<Vec<EnvironmentChange>> {
+        async fn update_environment(
+            &self,
+            _time: SimulationTime,
+        ) -> Result<Vec<EnvironmentChange>> {
             Ok(vec![])
         }
 
@@ -599,8 +610,13 @@ mod tests {
     #[test]
     fn test_environment_creation() {
         let rules = TestInteractionRules;
-        let env: Environment<TestPhysicalAsset, TestKnowledgeAsset, TestNetwork, TestInteractionRules, TestExogenousProcess> =
-            Environment::new(rules);
+        let env: Environment<
+            TestPhysicalAsset,
+            TestKnowledgeAsset,
+            TestNetwork,
+            TestInteractionRules,
+            TestExogenousProcess,
+        > = Environment::new(rules);
 
         assert_eq!(env.current_time(), 0.0);
         assert_eq!(env.physical_assets().count(), 0);
@@ -610,7 +626,13 @@ mod tests {
     #[test]
     fn test_add_physical_asset() {
         let rules = TestInteractionRules;
-        let mut env: Environment<TestPhysicalAsset, TestKnowledgeAsset, TestNetwork, TestInteractionRules, TestExogenousProcess> = Environment::new(rules);
+        let mut env: Environment<
+            TestPhysicalAsset,
+            TestKnowledgeAsset,
+            TestNetwork,
+            TestInteractionRules,
+            TestExogenousProcess,
+        > = Environment::new(rules);
 
         let asset = TestPhysicalAsset {
             id: AssetId::new(),

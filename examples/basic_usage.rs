@@ -9,8 +9,10 @@
 
 use consumer_choice_metamodel::{
     agent::{AgentAttributes, BasicAgentAttributes, ChoiceModule, ConsumerAgent},
-    environment::{Environment, PhysicalAsset, KnowledgeAsset, Network, RulesOfInteraction, ExogenousProcess},
-    information::{ Transformer, ReliabilityFilter, ConfirmationBiasDistorter},
+    environment::{
+        Environment, ExogenousProcess, KnowledgeAsset, Network, PhysicalAsset, RulesOfInteraction,
+    },
+    information::{ConfirmationBiasDistorter, ReliabilityFilter, Transformer},
     model::{ConsumerChoiceModel, ModelConfiguration},
     types::{AgentId, AssetId, EvaluationDimension, SimulationTime, TriggerType},
     utils::{ModelValidator, PrintEventHandler},
@@ -91,9 +93,18 @@ impl SimpleChoiceModule {
         let environmental_utility = (1.0 - choice.environmental_impact) * environmental_concern;
         let quality_utility = choice.quality * quality_preference;
 
-        let economic_weight = self.evaluation_weights.get(&EvaluationDimension::Economic).unwrap_or(&0.33);
-        let environmental_weight = self.evaluation_weights.get(&EvaluationDimension::Environmental).unwrap_or(&0.33);
-        let functional_weight = self.evaluation_weights.get(&EvaluationDimension::Functional).unwrap_or(&0.34);
+        let economic_weight = self
+            .evaluation_weights
+            .get(&EvaluationDimension::Economic)
+            .unwrap_or(&0.33);
+        let environmental_weight = self
+            .evaluation_weights
+            .get(&EvaluationDimension::Environmental)
+            .unwrap_or(&0.33);
+        let functional_weight = self
+            .evaluation_weights
+            .get(&EvaluationDimension::Functional)
+            .unwrap_or(&0.34);
 
         price_utility * economic_weight
             + environmental_utility * environmental_weight
@@ -224,14 +235,30 @@ struct DummyPhysicalAsset {
 }
 
 impl PhysicalAsset for DummyPhysicalAsset {
-    fn asset_id(&self) -> &AssetId { &self.id }
-    fn name(&self) -> &str { &self.name }
-    fn physical_properties(&self) -> HashMap<String, f64> { HashMap::new() }
-    fn performance_characteristics(&self) -> HashMap<String, f64> { HashMap::new() }
-    fn economic_attributes(&self) -> HashMap<String, f64> { HashMap::new() }
-    fn environmental_impact(&self) -> HashMap<String, f64> { HashMap::new() }
-    fn is_available(&self, _time: SimulationTime) -> bool { true }
-    fn update_state(&mut self, _time: SimulationTime) -> Result<()> { Ok(()) }
+    fn asset_id(&self) -> &AssetId {
+        &self.id
+    }
+    fn name(&self) -> &str {
+        &self.name
+    }
+    fn physical_properties(&self) -> HashMap<String, f64> {
+        HashMap::new()
+    }
+    fn performance_characteristics(&self) -> HashMap<String, f64> {
+        HashMap::new()
+    }
+    fn economic_attributes(&self) -> HashMap<String, f64> {
+        HashMap::new()
+    }
+    fn environmental_impact(&self) -> HashMap<String, f64> {
+        HashMap::new()
+    }
+    fn is_available(&self, _time: SimulationTime) -> bool {
+        true
+    }
+    fn update_state(&mut self, _time: SimulationTime) -> Result<()> {
+        Ok(())
+    }
 }
 
 #[derive(Debug)]
@@ -241,27 +268,57 @@ struct DummyKnowledgeAsset {
 }
 
 impl KnowledgeAsset for DummyKnowledgeAsset {
-    fn asset_id(&self) -> &AssetId { &self.id }
-    fn content(&self) -> &str { &self.content }
-    fn reliability(&self) -> f64 { 0.8 }
-    fn relevance(&self, _topic: &str) -> f64 { 0.5 }
-    fn timestamp(&self) -> SimulationTime { 0.0 }
-    fn is_accessible_to(&self, _agent_id: &AgentId) -> bool { true }
-    fn metadata(&self) -> HashMap<String, String> { HashMap::new() }
-    fn update_reliability(&mut self, _new_reliability: f64) -> Result<()> { Ok(()) }
+    fn asset_id(&self) -> &AssetId {
+        &self.id
+    }
+    fn content(&self) -> &str {
+        &self.content
+    }
+    fn reliability(&self) -> f64 {
+        0.8
+    }
+    fn relevance(&self, _topic: &str) -> f64 {
+        0.5
+    }
+    fn timestamp(&self) -> SimulationTime {
+        0.0
+    }
+    fn is_accessible_to(&self, _agent_id: &AgentId) -> bool {
+        true
+    }
+    fn metadata(&self) -> HashMap<String, String> {
+        HashMap::new()
+    }
+    fn update_reliability(&mut self, _new_reliability: f64) -> Result<()> {
+        Ok(())
+    }
 }
 
 #[derive(Debug)]
 struct DummyNetwork;
 
 impl Network for DummyNetwork {
-    fn agents(&self) -> Vec<AgentId> { Vec::new() }
-    fn are_connected(&self, _agent1: &AgentId, _agent2: &AgentId) -> bool { false }
-    fn connection_strength(&self, _agent1: &AgentId, _agent2: &AgentId) -> f64 { 0.0 }
-    fn add_agent(&mut self, _agent_id: AgentId) -> Result<()> { Ok(()) }
-    fn remove_agent(&mut self, _agent_id: &AgentId) -> Result<()> { Ok(()) }
-    fn connect_agents(&mut self, _agent1: AgentId, _agent2: AgentId, _strength: f64) -> Result<()> { Ok(()) }
-    fn neighbors(&self, _agent_id: &AgentId) -> Vec<AgentId> { Vec::new() }
+    fn agents(&self) -> Vec<AgentId> {
+        Vec::new()
+    }
+    fn are_connected(&self, _agent1: &AgentId, _agent2: &AgentId) -> bool {
+        false
+    }
+    fn connection_strength(&self, _agent1: &AgentId, _agent2: &AgentId) -> f64 {
+        0.0
+    }
+    fn add_agent(&mut self, _agent_id: AgentId) -> Result<()> {
+        Ok(())
+    }
+    fn remove_agent(&mut self, _agent_id: &AgentId) -> Result<()> {
+        Ok(())
+    }
+    fn connect_agents(&mut self, _agent1: AgentId, _agent2: AgentId, _strength: f64) -> Result<()> {
+        Ok(())
+    }
+    fn neighbors(&self, _agent_id: &AgentId) -> Vec<AgentId> {
+        Vec::new()
+    }
     fn network_statistics(&self) -> consumer_choice_metamodel::environment::NetworkStatistics {
         consumer_choice_metamodel::environment::NetworkStatistics {
             agent_count: 0,
@@ -281,32 +338,66 @@ impl RulesOfInteraction for DummyRules {
     type Interaction = String;
 
     #[cfg(feature = "async")]
-    async fn is_interaction_allowed(&self, _initiator: &AgentId, _target: &AgentId, _interaction: &Self::Interaction, _time: SimulationTime) -> Result<bool> { Ok(true) }
+    async fn is_interaction_allowed(
+        &self,
+        _initiator: &AgentId,
+        _target: &AgentId,
+        _interaction: &Self::Interaction,
+        _time: SimulationTime,
+    ) -> Result<bool> {
+        Ok(true)
+    }
 
     #[cfg(not(feature = "async"))]
-    fn is_interaction_allowed(&self, _initiator: &AgentId, _target: &AgentId, _interaction: &Self::Interaction, _time: SimulationTime) -> Result<bool> { Ok(true) }
+    fn is_interaction_allowed(
+        &self,
+        _initiator: &AgentId,
+        _target: &AgentId,
+        _interaction: &Self::Interaction,
+        _time: SimulationTime,
+    ) -> Result<bool> {
+        Ok(true)
+    }
 
     #[cfg(feature = "async")]
-    async fn process_interaction(&self, _initiator: &AgentId, target: &AgentId, _interaction: Self::Interaction, _time: SimulationTime) -> Result<Vec<consumer_choice_metamodel::environment::InteractionEffect>> {
-        Ok(vec![consumer_choice_metamodel::environment::InteractionEffect {
-            target_agent: target.clone(),
-            effect_type: "dummy".to_string(),
-            magnitude: 0.0,
-            duration: None,
-        }])
+    async fn process_interaction(
+        &self,
+        _initiator: &AgentId,
+        target: &AgentId,
+        _interaction: Self::Interaction,
+        _time: SimulationTime,
+    ) -> Result<Vec<consumer_choice_metamodel::environment::InteractionEffect>> {
+        Ok(vec![
+            consumer_choice_metamodel::environment::InteractionEffect {
+                target_agent: target.clone(),
+                effect_type: "dummy".to_string(),
+                magnitude: 0.0,
+                duration: None,
+            },
+        ])
     }
 
     #[cfg(not(feature = "async"))]
-    fn process_interaction(&self, _initiator: &AgentId, target: &AgentId, _interaction: Self::Interaction, _time: SimulationTime) -> Result<Vec<consumer_choice_metamodel::environment::InteractionEffect>> {
-        Ok(vec![consumer_choice_metamodel::environment::InteractionEffect {
-            target_agent: target.clone(),
-            effect_type: "dummy".to_string(),
-            magnitude: 0.0,
-            duration: None,
-        }])
+    fn process_interaction(
+        &self,
+        _initiator: &AgentId,
+        target: &AgentId,
+        _interaction: Self::Interaction,
+        _time: SimulationTime,
+    ) -> Result<Vec<consumer_choice_metamodel::environment::InteractionEffect>> {
+        Ok(vec![
+            consumer_choice_metamodel::environment::InteractionEffect {
+                target_agent: target.clone(),
+                effect_type: "dummy".to_string(),
+                magnitude: 0.0,
+                duration: None,
+            },
+        ])
     }
 
-    fn interaction_cost(&self, _interaction: &Self::Interaction) -> f64 { 0.0 }
+    fn interaction_cost(&self, _interaction: &Self::Interaction) -> f64 {
+        0.0
+    }
 }
 
 #[derive(Debug)]
@@ -315,14 +406,30 @@ struct DummyExogenousProcess;
 #[cfg_attr(feature = "async", async_trait)]
 impl ExogenousProcess for DummyExogenousProcess {
     #[cfg(feature = "async")]
-    async fn update_environment(&self, _time: SimulationTime) -> Result<Vec<consumer_choice_metamodel::environment::EnvironmentChange>> { Ok(Vec::new()) }
+    async fn update_environment(
+        &self,
+        _time: SimulationTime,
+    ) -> Result<Vec<consumer_choice_metamodel::environment::EnvironmentChange>> {
+        Ok(Vec::new())
+    }
 
     #[cfg(not(feature = "async"))]
-    fn update_environment(&self, _time: SimulationTime) -> Result<Vec<consumer_choice_metamodel::environment::EnvironmentChange>> { Ok(Vec::new()) }
+    fn update_environment(
+        &self,
+        _time: SimulationTime,
+    ) -> Result<Vec<consumer_choice_metamodel::environment::EnvironmentChange>> {
+        Ok(Vec::new())
+    }
 
-    fn is_active(&self, _time: SimulationTime) -> bool { false }
-    fn name(&self) -> &str { "dummy" }
-    fn frequency(&self) -> f64 { 0.0 }
+    fn is_active(&self, _time: SimulationTime) -> bool {
+        false
+    }
+    fn name(&self) -> &str {
+        "dummy"
+    }
+    fn frequency(&self) -> f64 {
+        0.0
+    }
 }
 
 fn main() -> Result<()> {
@@ -342,13 +449,22 @@ fn main() -> Result<()> {
         .with_stock_variable("house".to_string(), None);
 
     println!("Created agent with ID: {}", agent_id);
-    println!("Psychological attributes: {:?}", agent_attributes.psychological_attributes());
-    println!("Socioeconomic attributes: {:?}", agent_attributes.socioeconomic_attributes());
+    println!(
+        "Psychological attributes: {:?}",
+        agent_attributes.psychological_attributes()
+    );
+    println!(
+        "Socioeconomic attributes: {:?}",
+        agent_attributes.socioeconomic_attributes()
+    );
 
     // 2. Create choice module
     println!("\n2. Creating choice module...");
     let choice_module = SimpleChoiceModule::new();
-    println!("Choice module evaluation dimensions: {:?}", choice_module.evaluation_dimensions());
+    println!(
+        "Choice module evaluation dimensions: {:?}",
+        choice_module.evaluation_dimensions()
+    );
 
     // 3. Create consumer agent
     println!("\n3. Creating consumer agent...");
@@ -365,16 +481,26 @@ fn main() -> Result<()> {
 
     // 5. Create environment components
     println!("\n5. Creating environment...");
-    let environment: Environment<DummyPhysicalAsset, DummyKnowledgeAsset, DummyNetwork, DummyRules, DummyExogenousProcess> = Environment::new(DummyRules);
+    let environment: Environment<
+        DummyPhysicalAsset,
+        DummyKnowledgeAsset,
+        DummyNetwork,
+        DummyRules,
+        DummyExogenousProcess,
+    > = Environment::new(DummyRules);
     println!("Environment created");
 
     // 6. Create information transformer
     println!("\n6. Creating information transformer...");
-    let mut transformer: Transformer<ReliabilityFilter, ConfirmationBiasDistorter> = Transformer::new(100.0);
+    let mut transformer: Transformer<ReliabilityFilter, ConfirmationBiasDistorter> =
+        Transformer::new(100.0);
     transformer.add_filter(ReliabilityFilter::new(0.5));
     transformer.add_distorter(ConfirmationBiasDistorter::new(0.3));
-    println!("Information transformer created with {} filters and {} distorters",
-             transformer.filter_count(), transformer.distorter_count());
+    println!(
+        "Information transformer created with {} filters and {} distorters",
+        transformer.filter_count(),
+        transformer.distorter_count()
+    );
 
     // 7. Create model configuration
     println!("\n7. Creating model configuration...");
@@ -382,10 +508,10 @@ fn main() -> Result<()> {
         "Basic Usage Example".to_string(),
         "A simple example demonstrating basic usage".to_string(),
     )
-        .with_time_step(1.0)
-        .with_max_time(10.0)
-        .with_random_seed(42)
-        .with_validation(true);
+    .with_time_step(1.0)
+    .with_max_time(10.0)
+    .with_random_seed(42)
+    .with_validation(true);
 
     println!("Model configuration created: {}", config.name);
 
@@ -439,8 +565,13 @@ fn main() -> Result<()> {
         if let Some(agent) = model.get_agent(agent_id) {
             #[cfg(not(feature = "async"))]
             {
-                match agent.choice_module().make_choice(choices, &context, TriggerType::Economic) {
-                    Ok(Some(choice)) => println!("Agent chose: {} (${:.2})", choice.name, choice.price),
+                match agent
+                    .choice_module()
+                    .make_choice(choices, &context, TriggerType::Economic)
+                {
+                    Ok(Some(choice)) => {
+                        println!("Agent chose: {} (${:.2})", choice.name, choice.price)
+                    }
                     Ok(None) => println!("Agent made no choice"),
                     Err(e) => println!("Choice making failed: {}", e),
                 }

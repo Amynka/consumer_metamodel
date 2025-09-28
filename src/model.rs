@@ -1,7 +1,9 @@
 //! Main model implementation for the Consumer Choice Metamodel
 
 use crate::agent::{AgentAttributes, ChoiceModule, ConsumerAgent};
-use crate::environment::{Environment, ExogenousProcess, KnowledgeAsset, Network, PhysicalAsset, RulesOfInteraction};
+use crate::environment::{
+    Environment, ExogenousProcess, KnowledgeAsset, Network, PhysicalAsset, RulesOfInteraction,
+};
 use crate::information::{Information, Transformer};
 use crate::types::{AgentId, ModelId, SimulationTime};
 use crate::utils::{EventBus, ModelEvent, ModelValidator};
@@ -217,7 +219,8 @@ where
 
         // Validate agent if validation is enabled
         if self.configuration.validation_enabled {
-            self.validator.validate_agent_attributes(agent.attributes())?;
+            self.validator
+                .validate_agent_attributes(agent.attributes())?;
         }
 
         self.agents.insert(agent_id.clone(), agent);
@@ -396,7 +399,8 @@ where
             let filter_context = crate::information::FilterContext::new(new_time);
             let distortion_context = crate::information::DistortionContext::new(new_time);
 
-            let processed_info = self.information_transformer
+            let processed_info = self
+                .information_transformer
                 .process_information_for_agent(
                     agent_id,
                     all_information.clone(),
@@ -454,13 +458,12 @@ where
             let filter_context = crate::information::FilterContext::new(new_time);
             let distortion_context = crate::information::DistortionContext::new(new_time);
 
-            let processed_info = self.information_transformer
-                .process_information_for_agent(
-                    agent_id,
-                    all_information.clone(),
-                    &filter_context,
-                    &distortion_context,
-                )?;
+            let processed_info = self.information_transformer.process_information_for_agent(
+                agent_id,
+                all_information.clone(),
+                &filter_context,
+                &distortion_context,
+            )?;
 
             // Here you would implement agent decision-making logic
             // This is simplified for the example
@@ -501,7 +504,8 @@ where
         self.statistics.simulation_duration = self.current_time;
 
         // Calculate total choices made
-        let total_choices: usize = self.agents
+        let total_choices: usize = self
+            .agents
             .values()
             .map(|agent| agent.choice_history().len())
             .sum();
@@ -547,8 +551,8 @@ where
 mod tests {
     use super::*;
     use crate::agent::{BasicAgentAttributes, ConsumerAgent};
-    use crate::environment::{Environment};
-    use crate::information::{ReliabilityFilter, ConfirmationBiasDistorter, Transformer};
+    use crate::environment::Environment;
+    use crate::information::{ConfirmationBiasDistorter, ReliabilityFilter, Transformer};
     use crate::types::AgentId;
 
     // Test implementations for traits (simplified)
@@ -600,7 +604,11 @@ mod tests {
             Ok(HashMap::new())
         }
 
-        fn should_make_choice(&self, _trigger: crate::types::TriggerType, _context: &Self::Context) -> bool {
+        fn should_make_choice(
+            &self,
+            _trigger: crate::types::TriggerType,
+            _context: &Self::Context,
+        ) -> bool {
             true
         }
 
@@ -611,10 +619,7 @@ mod tests {
 
     #[test]
     fn test_model_configuration() {
-        let config = ModelConfiguration::new(
-            "Test Model".to_string(),
-            "A test model".to_string(),
-        )
+        let config = ModelConfiguration::new("Test Model".to_string(), "A test model".to_string())
             .with_time_step(0.5)
             .with_max_time(100.0)
             .with_random_seed(42);

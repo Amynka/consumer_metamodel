@@ -17,11 +17,17 @@ fn main() {
 fn main() -> consumer_choice_metamodel::Result<()> {
     use consumer_choice_metamodel::{
         agent::{AgentAttributes, BasicAgentAttributes, ChoiceModule, ConsumerAgent},
-        environment::{Environment, PhysicalAsset, KnowledgeAsset, Network, RulesOfInteraction, ExogenousProcess},
-        information::{Information, InformationFilter, InformationDistorter, Transformer, FilterContext, DistortionContext},
+        environment::{
+            Environment, ExogenousProcess, KnowledgeAsset, Network, PhysicalAsset,
+            RulesOfInteraction,
+        },
+        information::{
+            DistortionContext, FilterContext, Information, InformationDistorter, InformationFilter,
+            Transformer,
+        },
         model::{ConsumerChoiceModel, ModelConfiguration},
         types::{AgentId, AssetId, EvaluationDimension, SimulationTime, TriggerType},
-        utils::{EventBus, ModelValidator, ModelEvent, EventType},
+        utils::{EventBus, EventType, ModelEvent, ModelValidator},
         Result,
     };
     use rand::{Rng, SeedableRng};
@@ -37,11 +43,17 @@ fn main() -> consumer_choice_metamodel::Result<()> {
 fn run_simulation() -> consumer_choice_metamodel::Result<()> {
     use consumer_choice_metamodel::{
         agent::{AgentAttributes, BasicAgentAttributes, ChoiceModule, ConsumerAgent},
-        environment::{Environment, PhysicalAsset, KnowledgeAsset, Network, RulesOfInteraction, ExogenousProcess},
-        information::{Information, InformationFilter, InformationDistorter, Transformer, FilterContext, DistortionContext},
+        environment::{
+            Environment, ExogenousProcess, KnowledgeAsset, Network, PhysicalAsset,
+            RulesOfInteraction,
+        },
+        information::{
+            DistortionContext, FilterContext, Information, InformationDistorter, InformationFilter,
+            Transformer,
+        },
         model::{ConsumerChoiceModel, ModelConfiguration},
         types::{AgentId, AssetId, EvaluationDimension, SimulationTime, TriggerType},
-        utils::{EventBus, ModelValidator, ModelEvent, EventType},
+        utils::{EventBus, EventType, ModelEvent, ModelValidator},
         Result,
     };
     use rand::{Rng, SeedableRng};
@@ -66,7 +78,15 @@ fn run_simulation() -> consumer_choice_metamodel::Result<()> {
     }
 
     impl VehicleChoice {
-        fn new(name: String, brand: String, price: f64, fuel_efficiency: f64, safety_rating: f64, environmental_score: f64, luxury_level: f64) -> Self {
+        fn new(
+            name: String,
+            brand: String,
+            price: f64,
+            fuel_efficiency: f64,
+            safety_rating: f64,
+            environmental_score: f64,
+            luxury_level: f64,
+        ) -> Self {
             Self {
                 name,
                 brand,
@@ -111,10 +131,10 @@ fn run_simulation() -> consumer_choice_metamodel::Result<()> {
 
     #[derive(Debug)]
     enum DecisionStyle {
-        Analytical,    // Considers all factors carefully
-        Emotional,     // Focuses on personal preferences
-        Social,        // Influenced by others' choices
-        Economic,      // Primarily price-driven
+        Analytical, // Considers all factors carefully
+        Emotional,  // Focuses on personal preferences
+        Social,     // Influenced by others' choices
+        Economic,   // Primarily price-driven
     }
 
     impl VehicleChoiceModule {
@@ -126,20 +146,37 @@ fn run_simulation() -> consumer_choice_metamodel::Result<()> {
             }
         }
 
-        fn calculate_utility(&self, choice: &VehicleChoice, attributes: &dyn AgentAttributes, context: &MarketContext) -> f64 {
-            let price_sensitivity = attributes.get_psychological_attribute("price_sensitivity").unwrap_or(0.5);
-            let environmental_concern = attributes.get_psychological_attribute("environmental_concern").unwrap_or(0.5);
-            let safety_concern = attributes.get_psychological_attribute("safety_concern").unwrap_or(0.5);
-            let status_seeking = attributes.get_psychological_attribute("status_seeking").unwrap_or(0.5);
+        fn calculate_utility(
+            &self,
+            choice: &VehicleChoice,
+            attributes: &dyn AgentAttributes,
+            context: &MarketContext,
+        ) -> f64 {
+            let price_sensitivity = attributes
+                .get_psychological_attribute("price_sensitivity")
+                .unwrap_or(0.5);
+            let environmental_concern = attributes
+                .get_psychological_attribute("environmental_concern")
+                .unwrap_or(0.5);
+            let safety_concern = attributes
+                .get_psychological_attribute("safety_concern")
+                .unwrap_or(0.5);
+            let status_seeking = attributes
+                .get_psychological_attribute("status_seeking")
+                .unwrap_or(0.5);
 
-            let income = attributes.get_socioeconomic_attribute("income").unwrap_or(50000.0);
+            let income = attributes
+                .get_socioeconomic_attribute("income")
+                .unwrap_or(50000.0);
 
             // Economic utility
             let affordability = (income * 0.3 - choice.price).max(0.0) / (income * 0.3);
             let economic_utility = (1.0 - price_sensitivity) + price_sensitivity * affordability;
 
             // Environmental utility
-            let environmental_utility = choice.environmental_score * environmental_concern * context.environmental_awareness;
+            let environmental_utility = choice.environmental_score
+                * environmental_concern
+                * context.environmental_awareness;
 
             // Safety utility
             let safety_utility = choice.safety_rating * safety_concern;
@@ -156,20 +193,36 @@ fn run_simulation() -> consumer_choice_metamodel::Result<()> {
             // Weight utilities based on decision style
             let utility = match self.decision_style {
                 DecisionStyle::Analytical => {
-                    0.25 * economic_utility + 0.20 * environmental_utility +
-                    0.25 * safety_utility + 0.15 * fuel_utility + 0.15 * status_utility + brand_bonus
+                    0.25 * economic_utility
+                        + 0.20 * environmental_utility
+                        + 0.25 * safety_utility
+                        + 0.15 * fuel_utility
+                        + 0.15 * status_utility
+                        + brand_bonus
                 }
                 DecisionStyle::Emotional => {
-                    0.15 * economic_utility + 0.10 * environmental_utility +
-                    0.20 * safety_utility + 0.10 * fuel_utility + 0.45 * status_utility + brand_bonus
+                    0.15 * economic_utility
+                        + 0.10 * environmental_utility
+                        + 0.20 * safety_utility
+                        + 0.10 * fuel_utility
+                        + 0.45 * status_utility
+                        + brand_bonus
                 }
                 DecisionStyle::Social => {
-                    0.20 * economic_utility + 0.15 * environmental_utility +
-                    0.15 * safety_utility + 0.15 * fuel_utility + 0.35 * status_utility + brand_bonus * 2.0
+                    0.20 * economic_utility
+                        + 0.15 * environmental_utility
+                        + 0.15 * safety_utility
+                        + 0.15 * fuel_utility
+                        + 0.35 * status_utility
+                        + brand_bonus * 2.0
                 }
                 DecisionStyle::Economic => {
-                    0.50 * economic_utility + 0.10 * environmental_utility +
-                    0.15 * safety_utility + 0.25 * fuel_utility + 0.0 * status_utility + brand_bonus * 0.5
+                    0.50 * economic_utility
+                        + 0.10 * environmental_utility
+                        + 0.15 * safety_utility
+                        + 0.25 * fuel_utility
+                        + 0.0 * status_utility
+                        + brand_bonus * 0.5
                 }
             };
 
@@ -210,8 +263,11 @@ fn run_simulation() -> consumer_choice_metamodel::Result<()> {
             }
 
             // Filter affordable choices
-            let affordable_choices: Vec<_> = choices.into_iter()
-                .filter(|choice| choice.price <= context.available_budget || context.financing_available)
+            let affordable_choices: Vec<_> = choices
+                .into_iter()
+                .filter(|choice| {
+                    choice.price <= context.available_budget || context.financing_available
+                })
                 .collect();
 
             if affordable_choices.is_empty() {
@@ -302,14 +358,30 @@ fn run_simulation() -> consumer_choice_metamodel::Result<()> {
     }
 
     impl PhysicalAsset for CarAsset {
-        fn asset_id(&self) -> &AssetId { &self.id }
-        fn name(&self) -> &str { &self.name }
-        fn physical_properties(&self) -> HashMap<String, f64> { self.properties.clone() }
-        fn performance_characteristics(&self) -> HashMap<String, f64> { HashMap::new() }
-        fn economic_attributes(&self) -> HashMap<String, f64> { HashMap::new() }
-        fn environmental_impact(&self) -> HashMap<String, f64> { HashMap::new() }
-        fn is_available(&self, _time: SimulationTime) -> bool { true }
-        fn update_state(&mut self, _time: SimulationTime) -> Result<()> { Ok(()) }
+        fn asset_id(&self) -> &AssetId {
+            &self.id
+        }
+        fn name(&self) -> &str {
+            &self.name
+        }
+        fn physical_properties(&self) -> HashMap<String, f64> {
+            self.properties.clone()
+        }
+        fn performance_characteristics(&self) -> HashMap<String, f64> {
+            HashMap::new()
+        }
+        fn economic_attributes(&self) -> HashMap<String, f64> {
+            HashMap::new()
+        }
+        fn environmental_impact(&self) -> HashMap<String, f64> {
+            HashMap::new()
+        }
+        fn is_available(&self, _time: SimulationTime) -> bool {
+            true
+        }
+        fn update_state(&mut self, _time: SimulationTime) -> Result<()> {
+            Ok(())
+        }
     }
 
     #[derive(Debug)]
@@ -319,14 +391,30 @@ fn run_simulation() -> consumer_choice_metamodel::Result<()> {
     }
 
     impl KnowledgeAsset for MarketInfo {
-        fn asset_id(&self) -> &AssetId { &self.id }
-        fn content(&self) -> &str { &self.content }
-        fn reliability(&self) -> f64 { 0.8 }
-        fn relevance(&self, _topic: &str) -> f64 { 0.7 }
-        fn timestamp(&self) -> SimulationTime { 0.0 }
-        fn is_accessible_to(&self, _agent_id: &AgentId) -> bool { true }
-        fn metadata(&self) -> HashMap<String, String> { HashMap::new() }
-        fn update_reliability(&mut self, _new_reliability: f64) -> Result<()> { Ok(()) }
+        fn asset_id(&self) -> &AssetId {
+            &self.id
+        }
+        fn content(&self) -> &str {
+            &self.content
+        }
+        fn reliability(&self) -> f64 {
+            0.8
+        }
+        fn relevance(&self, _topic: &str) -> f64 {
+            0.7
+        }
+        fn timestamp(&self) -> SimulationTime {
+            0.0
+        }
+        fn is_accessible_to(&self, _agent_id: &AgentId) -> bool {
+            true
+        }
+        fn metadata(&self) -> HashMap<String, String> {
+            HashMap::new()
+        }
+        fn update_reliability(&mut self, _new_reliability: f64) -> Result<()> {
+            Ok(())
+        }
     }
 
     #[derive(Debug)]
@@ -345,12 +433,20 @@ fn run_simulation() -> consumer_choice_metamodel::Result<()> {
     }
 
     impl Network for SocialNetwork {
-        fn agents(&self) -> Vec<AgentId> { self.agents.clone() }
+        fn agents(&self) -> Vec<AgentId> {
+            self.agents.clone()
+        }
         fn are_connected(&self, agent1: &AgentId, agent2: &AgentId) -> bool {
-            self.connections.get(agent1).map_or(false, |neighbors| neighbors.contains(agent2))
+            self.connections
+                .get(agent1)
+                .map_or(false, |neighbors| neighbors.contains(agent2))
         }
         fn connection_strength(&self, agent1: &AgentId, agent2: &AgentId) -> f64 {
-            if self.are_connected(agent1, agent2) { 0.8 } else { 0.0 }
+            if self.are_connected(agent1, agent2) {
+                0.8
+            } else {
+                0.0
+            }
         }
         fn add_agent(&mut self, agent_id: AgentId) -> Result<()> {
             if !self.agents.contains(&agent_id) {
@@ -364,9 +460,20 @@ fn run_simulation() -> consumer_choice_metamodel::Result<()> {
             self.connections.remove(agent_id);
             Ok(())
         }
-        fn connect_agents(&mut self, agent1: AgentId, agent2: AgentId, _strength: f64) -> Result<()> {
-            self.connections.entry(agent1.clone()).or_insert_with(Vec::new).push(agent2.clone());
-            self.connections.entry(agent2).or_insert_with(Vec::new).push(agent1);
+        fn connect_agents(
+            &mut self,
+            agent1: AgentId,
+            agent2: AgentId,
+            _strength: f64,
+        ) -> Result<()> {
+            self.connections
+                .entry(agent1.clone())
+                .or_insert_with(Vec::new)
+                .push(agent2.clone());
+            self.connections
+                .entry(agent2)
+                .or_insert_with(Vec::new)
+                .push(agent1);
             Ok(())
         }
         fn neighbors(&self, agent_id: &AgentId) -> Vec<AgentId> {
@@ -374,7 +481,11 @@ fn run_simulation() -> consumer_choice_metamodel::Result<()> {
         }
         fn network_statistics(&self) -> consumer_choice_metamodel::environment::NetworkStatistics {
             let connection_count = self.connections.values().map(|v| v.len()).sum::<usize>() / 2;
-            let avg_degree = if self.agents.is_empty() { 0.0 } else { 2.0 * connection_count as f64 / self.agents.len() as f64 };
+            let avg_degree = if self.agents.is_empty() {
+                0.0
+            } else {
+                2.0 * connection_count as f64 / self.agents.len() as f64
+            };
 
             consumer_choice_metamodel::environment::NetworkStatistics {
                 agent_count: self.agents.len(),
@@ -382,8 +493,11 @@ fn run_simulation() -> consumer_choice_metamodel::Result<()> {
                 average_degree: avg_degree,
                 clustering_coefficient: 0.3, // Simplified
                 network_density: if self.agents.len() > 1 {
-                    2.0 * connection_count as f64 / (self.agents.len() * (self.agents.len() - 1)) as f64
-                } else { 0.0 },
+                    2.0 * connection_count as f64
+                        / (self.agents.len() * (self.agents.len() - 1)) as f64
+                } else {
+                    0.0
+                },
             }
         }
     }
@@ -396,32 +510,66 @@ fn run_simulation() -> consumer_choice_metamodel::Result<()> {
         type Interaction = String;
 
         #[cfg(feature = "async")]
-        async fn is_interaction_allowed(&self, _initiator: &AgentId, _target: &AgentId, _interaction: &Self::Interaction, _time: SimulationTime) -> Result<bool> { Ok(true) }
+        async fn is_interaction_allowed(
+            &self,
+            _initiator: &AgentId,
+            _target: &AgentId,
+            _interaction: &Self::Interaction,
+            _time: SimulationTime,
+        ) -> Result<bool> {
+            Ok(true)
+        }
 
         #[cfg(not(feature = "async"))]
-        fn is_interaction_allowed(&self, _initiator: &AgentId, _target: &AgentId, _interaction: &Self::Interaction, _time: SimulationTime) -> Result<bool> { Ok(true) }
+        fn is_interaction_allowed(
+            &self,
+            _initiator: &AgentId,
+            _target: &AgentId,
+            _interaction: &Self::Interaction,
+            _time: SimulationTime,
+        ) -> Result<bool> {
+            Ok(true)
+        }
 
         #[cfg(feature = "async")]
-        async fn process_interaction(&self, _initiator: &AgentId, target: &AgentId, _interaction: Self::Interaction, _time: SimulationTime) -> Result<Vec<consumer_choice_metamodel::environment::InteractionEffect>> {
-            Ok(vec![consumer_choice_metamodel::environment::InteractionEffect {
-                target_agent: target.clone(),
-                effect_type: "influence".to_string(),
-                magnitude: 0.1,
-                duration: Some(5.0),
-            }])
+        async fn process_interaction(
+            &self,
+            _initiator: &AgentId,
+            target: &AgentId,
+            _interaction: Self::Interaction,
+            _time: SimulationTime,
+        ) -> Result<Vec<consumer_choice_metamodel::environment::InteractionEffect>> {
+            Ok(vec![
+                consumer_choice_metamodel::environment::InteractionEffect {
+                    target_agent: target.clone(),
+                    effect_type: "influence".to_string(),
+                    magnitude: 0.1,
+                    duration: Some(5.0),
+                },
+            ])
         }
 
         #[cfg(not(feature = "async"))]
-        fn process_interaction(&self, _initiator: &AgentId, target: &AgentId, _interaction: Self::Interaction, _time: SimulationTime) -> Result<Vec<consumer_choice_metamodel::environment::InteractionEffect>> {
-            Ok(vec![consumer_choice_metamodel::environment::InteractionEffect {
-                target_agent: target.clone(),
-                effect_type: "influence".to_string(),
-                magnitude: 0.1,
-                duration: Some(5.0),
-            }])
+        fn process_interaction(
+            &self,
+            _initiator: &AgentId,
+            target: &AgentId,
+            _interaction: Self::Interaction,
+            _time: SimulationTime,
+        ) -> Result<Vec<consumer_choice_metamodel::environment::InteractionEffect>> {
+            Ok(vec![
+                consumer_choice_metamodel::environment::InteractionEffect {
+                    target_agent: target.clone(),
+                    effect_type: "influence".to_string(),
+                    magnitude: 0.1,
+                    duration: Some(5.0),
+                },
+            ])
         }
 
-        fn interaction_cost(&self, _interaction: &Self::Interaction) -> f64 { 0.1 }
+        fn interaction_cost(&self, _interaction: &Self::Interaction) -> f64 {
+            0.1
+        }
     }
 
     #[derive(Debug)]
@@ -442,36 +590,52 @@ fn run_simulation() -> consumer_choice_metamodel::Result<()> {
     #[cfg_attr(feature = "async", async_trait)]
     impl ExogenousProcess for EconomicCycle {
         #[cfg(feature = "async")]
-        async fn update_environment(&self, time: SimulationTime) -> Result<Vec<consumer_choice_metamodel::environment::EnvironmentChange>> {
+        async fn update_environment(
+            &self,
+            time: SimulationTime,
+        ) -> Result<Vec<consumer_choice_metamodel::environment::EnvironmentChange>> {
             let phase = (time * 2.0 * std::f64::consts::PI / self.cycle_length).sin();
             let economic_impact = phase * self.amplitude;
 
-            Ok(vec![consumer_choice_metamodel::environment::EnvironmentChange {
-                change_type: "economic_conditions".to_string(),
-                affected_assets: Vec::new(),
-                magnitude: economic_impact,
-                duration: Some(1.0),
-                description: format!("Economic cycle impact: {:.2}", economic_impact),
-            }])
+            Ok(vec![
+                consumer_choice_metamodel::environment::EnvironmentChange {
+                    change_type: "economic_conditions".to_string(),
+                    affected_assets: Vec::new(),
+                    magnitude: economic_impact,
+                    duration: Some(1.0),
+                    description: format!("Economic cycle impact: {:.2}", economic_impact),
+                },
+            ])
         }
 
         #[cfg(not(feature = "async"))]
-        fn update_environment(&self, time: SimulationTime) -> Result<Vec<consumer_choice_metamodel::environment::EnvironmentChange>> {
+        fn update_environment(
+            &self,
+            time: SimulationTime,
+        ) -> Result<Vec<consumer_choice_metamodel::environment::EnvironmentChange>> {
             let phase = (time * 2.0 * std::f64::consts::PI / self.cycle_length).sin();
             let economic_impact = phase * self.amplitude;
 
-            Ok(vec![consumer_choice_metamodel::environment::EnvironmentChange {
-                change_type: "economic_conditions".to_string(),
-                affected_assets: Vec::new(),
-                magnitude: economic_impact,
-                duration: Some(1.0),
-                description: format!("Economic cycle impact: {:.2}", economic_impact),
-            }])
+            Ok(vec![
+                consumer_choice_metamodel::environment::EnvironmentChange {
+                    change_type: "economic_conditions".to_string(),
+                    affected_assets: Vec::new(),
+                    magnitude: economic_impact,
+                    duration: Some(1.0),
+                    description: format!("Economic cycle impact: {:.2}", economic_impact),
+                },
+            ])
         }
 
-        fn is_active(&self, _time: SimulationTime) -> bool { true }
-        fn name(&self) -> &str { "Economic Cycle" }
-        fn frequency(&self) -> f64 { 1.0 / self.cycle_length }
+        fn is_active(&self, _time: SimulationTime) -> bool {
+            true
+        }
+        fn name(&self) -> &str {
+            "Economic Cycle"
+        }
+        fn frequency(&self) -> f64 {
+            1.0 / self.cycle_length
+        }
     }
 
     // Custom information filter for vehicle information
@@ -489,30 +653,54 @@ fn run_simulation() -> consumer_choice_metamodel::Result<()> {
     #[cfg_attr(feature = "async", async_trait)]
     impl InformationFilter for VehicleInfoFilter {
         #[cfg(feature = "async")]
-        async fn filter_information(&self, information: Vec<Information>, _agent_id: &AgentId, _context: &FilterContext) -> Result<Vec<Information>> {
-            Ok(information.into_iter()
+        async fn filter_information(
+            &self,
+            information: Vec<Information>,
+            _agent_id: &AgentId,
+            _context: &FilterContext,
+        ) -> Result<Vec<Information>> {
+            Ok(information
+                .into_iter()
                 .filter(|info| info.topic.contains("vehicle") || info.topic.contains("car"))
                 .collect())
         }
 
         #[cfg(not(feature = "async"))]
-        fn filter_information(&self, information: Vec<Information>, _agent_id: &AgentId, _context: &FilterContext) -> Result<Vec<Information>> {
-            Ok(information.into_iter()
+        fn filter_information(
+            &self,
+            information: Vec<Information>,
+            _agent_id: &AgentId,
+            _context: &FilterContext,
+        ) -> Result<Vec<Information>> {
+            Ok(information
+                .into_iter()
                 .filter(|info| info.topic.contains("vehicle") || info.topic.contains("car"))
                 .collect())
         }
 
         #[cfg(feature = "async")]
-        async fn passes_filter(&self, information: &Information, _agent_id: &AgentId, _context: &FilterContext) -> Result<bool> {
+        async fn passes_filter(
+            &self,
+            information: &Information,
+            _agent_id: &AgentId,
+            _context: &FilterContext,
+        ) -> Result<bool> {
             Ok(information.topic.contains("vehicle") || information.topic.contains("car"))
         }
 
         #[cfg(not(feature = "async"))]
-        fn passes_filter(&self, information: &Information, _agent_id: &AgentId, _context: &FilterContext) -> Result<bool> {
+        fn passes_filter(
+            &self,
+            information: &Information,
+            _agent_id: &AgentId,
+            _context: &FilterContext,
+        ) -> Result<bool> {
             Ok(information.topic.contains("vehicle") || information.topic.contains("car"))
         }
 
-        fn filter_name(&self) -> &str { "VehicleInfoFilter" }
+        fn filter_name(&self) -> &str {
+            "VehicleInfoFilter"
+        }
         fn parameters(&self) -> HashMap<String, f64> {
             let mut params = HashMap::new();
             params.insert("min_relevance".to_string(), self.min_relevance);
@@ -540,7 +728,12 @@ fn run_simulation() -> consumer_choice_metamodel::Result<()> {
     #[cfg_attr(feature = "async", async_trait)]
     impl InformationDistorter for BrandPreferenceDistorter {
         #[cfg(feature = "async")]
-        async fn distort_information(&self, mut information: Information, _agent_id: &AgentId, _context: &DistortionContext) -> Result<Information> {
+        async fn distort_information(
+            &self,
+            mut information: Information,
+            _agent_id: &AgentId,
+            _context: &DistortionContext,
+        ) -> Result<Information> {
             // Boost reliability for preferred brands
             for (brand, boost) in &self.preferred_brands {
                 if information.content.contains(brand) {
@@ -552,7 +745,12 @@ fn run_simulation() -> consumer_choice_metamodel::Result<()> {
         }
 
         #[cfg(not(feature = "async"))]
-        fn distort_information(&self, mut information: Information, _agent_id: &AgentId, _context: &DistortionContext) -> Result<Information> {
+        fn distort_information(
+            &self,
+            mut information: Information,
+            _agent_id: &AgentId,
+            _context: &DistortionContext,
+        ) -> Result<Information> {
             // Boost reliability for preferred brands
             for (brand, boost) in &self.preferred_brands {
                 if information.content.contains(brand) {
@@ -572,7 +770,9 @@ fn run_simulation() -> consumer_choice_metamodel::Result<()> {
             0.0
         }
 
-        fn distorter_name(&self) -> &str { "BrandPreferenceDistorter" }
+        fn distorter_name(&self) -> &str {
+            "BrandPreferenceDistorter"
+        }
         fn parameters(&self) -> HashMap<String, f64> {
             self.preferred_brands.clone()
         }
@@ -582,7 +782,13 @@ fn run_simulation() -> consumer_choice_metamodel::Result<()> {
     println!("\n1. Setting up simulation environment...");
 
     // Create environment
-    let mut environment: Environment<CarAsset, MarketInfo, SocialNetwork, SimpleRules, EconomicCycle> = Environment::new(SimpleRules);
+    let mut environment: Environment<
+        CarAsset,
+        MarketInfo,
+        SocialNetwork,
+        SimpleRules,
+        EconomicCycle,
+    > = Environment::new(SimpleRules);
 
     // Add some physical assets (vehicles)
     let vehicles = vec![
@@ -594,7 +800,7 @@ fn run_simulation() -> consumer_choice_metamodel::Result<()> {
                 props.insert("price".to_string(), 28000.0);
                 props.insert("fuel_efficiency".to_string(), 45.0);
                 props
-            }
+            },
         },
         CarAsset {
             id: AssetId::new(),
@@ -604,7 +810,7 @@ fn run_simulation() -> consumer_choice_metamodel::Result<()> {
                 props.insert("price".to_string(), 55000.0);
                 props.insert("fuel_efficiency".to_string(), 25.0);
                 props
-            }
+            },
         },
     ];
 
@@ -639,7 +845,8 @@ fn run_simulation() -> consumer_choice_metamodel::Result<()> {
 
     // Create information transformer
     println!("\n2. Setting up information processing...");
-    let mut transformer: Transformer<VehicleInfoFilter, BrandPreferenceDistorter> = Transformer::new(50.0);
+    let mut transformer: Transformer<VehicleInfoFilter, BrandPreferenceDistorter> =
+        Transformer::new(50.0);
     transformer.add_filter(VehicleInfoFilter::new(0.5));
     transformer.add_distorter(BrandPreferenceDistorter::new());
     println!("Information transformer configured");
@@ -655,9 +862,11 @@ fn run_simulation() -> consumer_choice_metamodel::Result<()> {
     .with_random_seed(123)
     .with_validation(true);
 
-    println!("Model configured: {} steps over {:.0} time units",
-             (config.max_simulation_time / config.time_step) as i32,
-             config.max_simulation_time);
+    println!(
+        "Model configured: {} steps over {:.0} time units",
+        (config.max_simulation_time / config.time_step) as i32,
+        config.max_simulation_time
+    );
 
     // Create model
     println!("\n4. Creating simulation model...");
@@ -687,7 +896,9 @@ fn run_simulation() -> consumer_choice_metamodel::Result<()> {
             }
         }
     }
-    model.event_bus().add_handler(Box::new(SimulationEventHandler));
+    model
+        .event_bus()
+        .add_handler(Box::new(SimulationEventHandler));
 
     println!("Model created with event handling");
 
@@ -714,7 +925,10 @@ fn run_simulation() -> consumer_choice_metamodel::Result<()> {
 
         let attributes = BasicAgentAttributes::new(agent_id.clone())
             .with_psychological_attribute("price_sensitivity".to_string(), price_sensitivity)
-            .with_psychological_attribute("environmental_concern".to_string(), environmental_concern)
+            .with_psychological_attribute(
+                "environmental_concern".to_string(),
+                environmental_concern,
+            )
             .with_psychological_attribute("safety_concern".to_string(), safety_concern)
             .with_psychological_attribute("status_seeking".to_string(), status_seeking)
             .with_socioeconomic_attribute("income".to_string(), income)
@@ -725,8 +939,10 @@ fn run_simulation() -> consumer_choice_metamodel::Result<()> {
         let agent = ConsumerAgent::new(attributes, choice_module);
 
         model.add_agent(agent)?;
-        println!("Added {}: Income=${:.0}, Age={:.0}, Price Sens={:.2}, Env Concern={:.2}",
-                 profile_name, income, age, price_sensitivity, environmental_concern);
+        println!(
+            "Added {}: Income=${:.0}, Age={:.0}, Price Sens={:.2}, Env Concern={:.2}",
+            profile_name, income, age, price_sensitivity, environmental_concern
+        );
     }
 
     // Display initial statistics
@@ -737,14 +953,15 @@ fn run_simulation() -> consumer_choice_metamodel::Result<()> {
 
     // Run simulation
     println!("\n7. Running simulation...");
-    println!("   Progress: [", );
+    println!("   Progress: [",);
     let start_time = std::time::Instant::now();
 
     #[cfg(not(feature = "async"))]
     {
         model.start()?;
         let mut step_count = 0;
-        let total_steps = (model.configuration().max_simulation_time / model.configuration().time_step) as i32;
+        let total_steps =
+            (model.configuration().max_simulation_time / model.configuration().time_step) as i32;
 
         while model.state() == consumer_choice_metamodel::model::ModelState::Running {
             model.step()?;
@@ -784,9 +1001,15 @@ fn run_simulation() -> consumer_choice_metamodel::Result<()> {
     // Analyze results
     println!("\n8. Simulation Results:");
     let final_stats = model.statistics();
-    println!("   Total simulation time: {:.2}", final_stats.simulation_duration);
+    println!(
+        "   Total simulation time: {:.2}",
+        final_stats.simulation_duration
+    );
     println!("   Total choices made: {}", final_stats.total_choices_made);
-    println!("   Average choices per agent: {:.2}", final_stats.average_choices_per_agent);
+    println!(
+        "   Average choices per agent: {:.2}",
+        final_stats.average_choices_per_agent
+    );
     println!("   Events processed: {}", final_stats.events_processed);
 
     // Analyze agent choices
@@ -796,10 +1019,12 @@ fn run_simulation() -> consumer_choice_metamodel::Result<()> {
             let choice_count = agent.choice_history().len();
             let last_choice_time = agent.last_choice_time().unwrap_or(0.0);
 
-            println!("   Agent {}: {} choices, last choice at time {:.1}",
-                     agent_id.to_string().chars().take(8).collect::<String>(),
-                     choice_count,
-                     last_choice_time);
+            println!(
+                "   Agent {}: {} choices, last choice at time {:.1}",
+                agent_id.to_string().chars().take(8).collect::<String>(),
+                choice_count,
+                last_choice_time
+            );
         }
     }
 
@@ -813,7 +1038,10 @@ fn run_simulation() -> consumer_choice_metamodel::Result<()> {
 
     if !choice_events.is_empty() {
         println!("    First choice at: {:.1}", choice_events[0].timestamp);
-        println!("    Last choice at: {:.1}", choice_events.last().unwrap().timestamp);
+        println!(
+            "    Last choice at: {:.1}",
+            choice_events.last().unwrap().timestamp
+        );
     }
 
     println!("\n==============================================");

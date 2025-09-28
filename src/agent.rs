@@ -172,7 +172,10 @@ where
             return Ok(None);
         }
 
-        let chosen = self.choice_module.make_choice(choices, context, trigger).await?;
+        let chosen = self
+            .choice_module
+            .make_choice(choices, context, trigger)
+            .await?;
 
         if let Some(ref choice) = chosen {
             // Evaluate the chosen option
@@ -205,18 +208,23 @@ where
         context: &C::Context,
         current_time: SimulationTime,
     ) -> Result<Option<C::Choice>> {
-        if !self.choice_module.should_make_choice(trigger.clone(), context) {
+        if !self
+            .choice_module
+            .should_make_choice(trigger.clone(), context)
+        {
             return Ok(None);
         }
 
-        let chosen = self.choice_module.make_choice(choices, context, trigger.clone())?;
+        let chosen = self
+            .choice_module
+            .make_choice(choices, context, trigger.clone())?;
 
         if let Some(ref choice) = chosen {
             // Evaluate the chosen option
             let dimensions = self.choice_module.evaluation_dimensions();
-            let evaluation_scores = self
-                .choice_module
-                .evaluate_choice(choice, &dimensions, context)?;
+            let evaluation_scores =
+                self.choice_module
+                    .evaluate_choice(choice, &dimensions, context)?;
 
             // Record the choice
             let record = ChoiceRecord {
@@ -413,7 +421,10 @@ mod tests {
             .with_stock_variable("car".to_string(), Some("sedan".to_string()));
 
         assert_eq!(attrs.agent_id(), &agent_id);
-        assert_eq!(attrs.get_psychological_attribute("risk_aversion"), Some(0.5));
+        assert_eq!(
+            attrs.get_psychological_attribute("risk_aversion"),
+            Some(0.5)
+        );
         assert_eq!(attrs.get_socioeconomic_attribute("income"), Some(50000.0));
         assert!(attrs.owns_stock_variable("car"));
         assert!(!attrs.owns_stock_variable("house"));

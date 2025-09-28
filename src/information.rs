@@ -304,7 +304,8 @@ where
         for info in processed_info {
             let mut distorted = info;
             for distorter in &self.distorters {
-                distorted = distorter.distort_information(distorted, agent_id, distortion_context)?;
+                distorted =
+                    distorter.distort_information(distorted, agent_id, distortion_context)?;
             }
             distorted_info.push(distorted);
         }

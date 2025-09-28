@@ -50,11 +50,7 @@ pub struct ModelEvent {
 
 impl ModelEvent {
     /// Create a new model event
-    pub fn new(
-        event_type: EventType,
-        timestamp: SimulationTime,
-        description: String,
-    ) -> Self {
+    pub fn new(event_type: EventType, timestamp: SimulationTime, description: String) -> Self {
         Self {
             event_type,
             timestamp,
@@ -261,7 +257,9 @@ impl EventBus {
         if let Ok(events) = self.events.lock() {
             events
                 .iter()
-                .filter(|event| std::mem::discriminant(&event.event_type) == std::mem::discriminant(&event_type))
+                .filter(|event| {
+                    std::mem::discriminant(&event.event_type) == std::mem::discriminant(&event_type)
+                })
                 .cloned()
                 .collect()
         } else {
@@ -503,7 +501,9 @@ mod tests {
             .with_psychological_attribute("risk_aversion".to_string(), 0.5)
             .with_socioeconomic_attribute("income".to_string(), 50000.0);
 
-        assert!(validator.validate_agent_attributes(&valid_attributes).is_ok());
+        assert!(validator
+            .validate_agent_attributes(&valid_attributes)
+            .is_ok());
     }
 
     #[test]
@@ -526,12 +526,16 @@ mod tests {
 
         // Missing required attributes
         let invalid_attributes = BasicAgentAttributes::new(agent_id.clone());
-        assert!(validator.validate_agent_attributes(&invalid_attributes).is_err());
+        assert!(validator
+            .validate_agent_attributes(&invalid_attributes)
+            .is_err());
 
         // Valid attributes
         let valid_attributes = BasicAgentAttributes::new(agent_id)
             .with_psychological_attribute("risk_aversion".to_string(), 0.5)
             .with_socioeconomic_attribute("income".to_string(), 50000.0);
-        assert!(validator.validate_agent_attributes(&valid_attributes).is_ok());
+        assert!(validator
+            .validate_agent_attributes(&valid_attributes)
+            .is_ok());
     }
 }
