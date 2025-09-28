@@ -392,7 +392,7 @@ impl ModelValidator {
 
         // Validate psychological attribute values
         for (name, value) in psychological {
-            if value < 0.0 || value > 1.0 {
+            if !(0.0..=1.0).contains(&value) {
                 return Err(Error::Validation(format!(
                     "Psychological attribute '{}' must be between 0.0 and 1.0, got {}",
                     name, value
