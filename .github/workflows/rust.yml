@@ -32,13 +32,13 @@ jobs:
         cat result.log >> $GITHUB_ENV
         echo "EOF" >> $GITHUB_ENV
         set -e
-
-    - name: Comment on PR
-      uses: marocchino/sticky-pull-request-comment@v2
+        
+    - name: Create Issue Comment
+      uses: peter-evans/create-or-update-comment@v2
       if: github.event_name == 'pull_request'
       with:
-        message: |
-          🧪 **Cargo Test Results**
-          ```
-          ${{ env.TEST_RESULT }}
+        token: ${{ secrets.GITHUB_TOKEN }}
+        issue-number: ${{ github.event.pull_request.number }}
+        body: " **Cargo Test Results** ... ${{env.TEST_RESULT]}"
+
 
