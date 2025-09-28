@@ -11,18 +11,19 @@ env:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v4
+
     - name: Build
       run: cargo build --verbose
-    - name: Run tests
+
+    - name: Run tests (push only)
       if: github.event_name != 'pull_request'
       run: cargo test --verbose
-    
-    - name: Run cargo test
+
+    - name: Run tests and capture output (PR only)
       if: github.event_name == 'pull_request'
       id: run_tests
       run: |
@@ -32,13 +33,15 @@ jobs:
         cat result.log >> $GITHUB_ENV
         echo "EOF" >> $GITHUB_ENV
         set -e
-        
-    - name: Create Issue Comment
-      uses: peter-evans/create-or-update-comment@v2
+
+    - name: Comment on PR with test results
       if: github.event_name == 'pull_request'
+      uses: peter-evans/create-or-update-comment@v2
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
         issue-number: ${{ github.event.pull_request.number }}
-        body: " **Cargo Test Results** ... ${{env.TEST_RESULT]}"
-
-
+        body: |
+          🧪 **Cargo Test Results**
+          ```
+          ${{ env.TEST_RESULT }}
+          ```
