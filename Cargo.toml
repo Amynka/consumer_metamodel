@@ -1,0 +1,48 @@
+[package]
+name = "consumer-choice-metamodel"
+version = "0.1.0"
+edition = "2021"
+authors = ["SiLab-group <amy.liffey@hevs,ch>", "Amy Liffey"]
+description = "Abstract traits and types for implementing the Consumer Choice Metamodel for agent-based consumer behavior simulation"
+license = "Apache-2.0"
+repository = "https://github.com/SiLab-group/consumer-choice-metamodel-rust"
+documentation = "https://docs.rs/consumer-choice-metamodel"
+readme = "README.md"
+keywords = ["agent-based-modeling", "consumer-behavior", "simulation", "metamodel", "choice-modeling"]
+categories = ["simulation", "science", "api-bindings"]
+
+[dependencies]
+serde = { version = "1.0", features = ["derive"], optional = true }
+uuid = { version = "1.0", features = ["v4"] }
+thiserror = "1.0"
+tokio = { version = "1.0", features = ["full"], optional = true }
+async-trait = { version = "0.1", optional = true }
+rand = { version = "0.8", optional = true }
+
+[dev-dependencies]
+tokio-test = "0.4"
+criterion = { version = "0.5", features = ["html_reports"] }
+
+[features]
+default = []
+serde = ["dep:serde"]
+async = ["tokio", "async-trait"]
+simulation = ["rand"]
+full = ["serde", "async", "simulation"]
+
+#[[bench]]
+#name = "model_performance"
+#harness = false
+
+[lib]
+name = "consumer_choice_metamodel"
+path = "src/lib.rs"
+
+[[example]]
+name = "basic_usage"
+path = "examples/basic_usage.rs"
+
+[[example]]
+name = "simulation"
+path = "examples/simulation.rs"
+required-features = ["simulation"]
