@@ -9,6 +9,7 @@ cargo build                    # Build library
 cargo test                     # Run tests
 cargo run --example basic_usage                    # Run basic example
 cargo run --example simulation --features simulation  # Run simulation
+cargo run --example adoption --features simulation  # Run simulation
 ```
 
 ## File Content
