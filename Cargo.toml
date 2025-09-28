@@ -46,3 +46,8 @@ path = "examples/basic_usage.rs"
 name = "simulation"
 path = "examples/simulation.rs"
 required-features = ["simulation"]
+
+[[example]]
+name = "adoption"
+path = "examples/adoption.rs"
+required-features = ["simulation"]

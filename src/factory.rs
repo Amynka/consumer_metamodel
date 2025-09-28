@@ -1,7 +1,9 @@
 //! Factory pattern implementations for the Consumer Choice Metamodel
 
 use crate::agent::{AgentAttributes, ChoiceModule, ConsumerAgent};
-use crate::environment::{ExogenousProcess, KnowledgeAsset, Network, PhysicalAsset, RulesOfInteraction};
+use crate::environment::{
+    ExogenousProcess, KnowledgeAsset, Network, PhysicalAsset, RulesOfInteraction,
+};
 use crate::information::{InformationDistorter, InformationFilter};
 use crate::types::{AgentId, AssetId, SimulationTime};
 use crate::{Error, Result};
@@ -200,17 +202,24 @@ pub trait ModelComponentFactory: std::fmt::Debug + Send + Sync {
 
     /// Create an information filter
     #[cfg(feature = "async")]
-    async fn create_information_filter(&self, filter_type: &str) -> Result<Self::InformationFilter>;
+    async fn create_information_filter(&self, filter_type: &str)
+        -> Result<Self::InformationFilter>;
 
     #[cfg(not(feature = "async"))]
     fn create_information_filter(&self, filter_type: &str) -> Result<Self::InformationFilter>;
 
     /// Create an information distorter
     #[cfg(feature = "async")]
-    async fn create_information_distorter(&self, distorter_type: &str) -> Result<Self::InformationDistorter>;
+    async fn create_information_distorter(
+        &self,
+        distorter_type: &str,
+    ) -> Result<Self::InformationDistorter>;
 
     #[cfg(not(feature = "async"))]
-    fn create_information_distorter(&self, distorter_type: &str) -> Result<Self::InformationDistorter>;
+    fn create_information_distorter(
+        &self,
+        distorter_type: &str,
+    ) -> Result<Self::InformationDistorter>;
 
     /// Get factory name
     fn factory_name(&self) -> &str;
@@ -251,7 +260,7 @@ impl Default for BasicModelFactory {
 mod factory_tests {
     use super::*;
     use crate::agent::BasicAgentAttributes;
-    use crate::information::{ReliabilityFilter, ConfirmationBiasDistorter};
+    use crate::information::{ConfirmationBiasDistorter, ReliabilityFilter};
 
     // Mock implementations for testing
     #[derive(Debug)]
@@ -263,27 +272,51 @@ mod factory_tests {
         type Context = ();
 
         #[cfg(feature = "async")]
-        async fn make_choice(&self, choices: Vec<String>, _context: &(), _trigger: crate::types::TriggerType) -> Result<Option<String>> {
+        async fn make_choice(
+            &self,
+            choices: Vec<String>,
+            _context: &(),
+            _trigger: crate::types::TriggerType,
+        ) -> Result<Option<String>> {
             Ok(choices.into_iter().next())
         }
 
         #[cfg(not(feature = "async"))]
-        fn make_choice(&self, choices: Vec<String>, _context: &(), _trigger: crate::types::TriggerType) -> Result<Option<String>> {
+        fn make_choice(
+            &self,
+            choices: Vec<String>,
+            _context: &(),
+            _trigger: crate::types::TriggerType,
+        ) -> Result<Option<String>> {
             Ok(choices.into_iter().next())
         }
 
         #[cfg(feature = "async")]
-        async fn evaluate_choice(&self, _choice: &String, _dimensions: &[crate::types::EvaluationDimension], _context: &()) -> Result<HashMap<crate::types::EvaluationDimension, f64>> {
+        async fn evaluate_choice(
+            &self,
+            _choice: &String,
+            _dimensions: &[crate::types::EvaluationDimension],
+            _context: &(),
+        ) -> Result<HashMap<crate::types::EvaluationDimension, f64>> {
             Ok(HashMap::new())
         }
 
         #[cfg(not(feature = "async"))]
-        fn evaluate_choice(&self, _choice: &String, _dimensions: &[crate::types::EvaluationDimension], _context: &()) -> Result<HashMap<crate::types::EvaluationDimension, f64>> {
+        fn evaluate_choice(
+            &self,
+            _choice: &String,
+            _dimensions: &[crate::types::EvaluationDimension],
+            _context: &(),
+        ) -> Result<HashMap<crate::types::EvaluationDimension, f64>> {
             Ok(HashMap::new())
         }
 
-        fn should_make_choice(&self, _trigger: crate::types::TriggerType, _context: &()) -> bool { true }
-        fn evaluation_dimensions(&self) -> Vec<crate::types::EvaluationDimension> { Vec::new() }
+        fn should_make_choice(&self, _trigger: crate::types::TriggerType, _context: &()) -> bool {
+            true
+        }
+        fn evaluation_dimensions(&self) -> Vec<crate::types::EvaluationDimension> {
+            Vec::new()
+        }
     }
 
     #[derive(Debug)]
@@ -293,14 +326,30 @@ mod factory_tests {
     }
 
     impl PhysicalAsset for MockPhysicalAsset {
-        fn asset_id(&self) -> &AssetId { &self.id }
-        fn name(&self) -> &str { &self.name }
-        fn physical_properties(&self) -> HashMap<String, f64> { HashMap::new() }
-        fn performance_characteristics(&self) -> HashMap<String, f64> { HashMap::new() }
-        fn economic_attributes(&self) -> HashMap<String, f64> { HashMap::new() }
-        fn environmental_impact(&self) -> HashMap<String, f64> { HashMap::new() }
-        fn is_available(&self, _time: SimulationTime) -> bool { true }
-        fn update_state(&mut self, _time: SimulationTime) -> Result<()> { Ok(()) }
+        fn asset_id(&self) -> &AssetId {
+            &self.id
+        }
+        fn name(&self) -> &str {
+            &self.name
+        }
+        fn physical_properties(&self) -> HashMap<String, f64> {
+            HashMap::new()
+        }
+        fn performance_characteristics(&self) -> HashMap<String, f64> {
+            HashMap::new()
+        }
+        fn economic_attributes(&self) -> HashMap<String, f64> {
+            HashMap::new()
+        }
+        fn environmental_impact(&self) -> HashMap<String, f64> {
+            HashMap::new()
+        }
+        fn is_available(&self, _time: SimulationTime) -> bool {
+            true
+        }
+        fn update_state(&mut self, _time: SimulationTime) -> Result<()> {
+            Ok(())
+        }
     }
 
     #[derive(Debug)]
@@ -310,27 +359,62 @@ mod factory_tests {
     }
 
     impl KnowledgeAsset for MockKnowledgeAsset {
-        fn asset_id(&self) -> &AssetId { &self.id }
-        fn content(&self) -> &str { &self.content }
-        fn reliability(&self) -> f64 { 0.8 }
-        fn relevance(&self, _topic: &str) -> f64 { 0.5 }
-        fn timestamp(&self) -> SimulationTime { 0.0 }
-        fn is_accessible_to(&self, _agent_id: &AgentId) -> bool { true }
-        fn metadata(&self) -> HashMap<String, String> { HashMap::new() }
-        fn update_reliability(&mut self, _new_reliability: f64) -> Result<()> { Ok(()) }
+        fn asset_id(&self) -> &AssetId {
+            &self.id
+        }
+        fn content(&self) -> &str {
+            &self.content
+        }
+        fn reliability(&self) -> f64 {
+            0.8
+        }
+        fn relevance(&self, _topic: &str) -> f64 {
+            0.5
+        }
+        fn timestamp(&self) -> SimulationTime {
+            0.0
+        }
+        fn is_accessible_to(&self, _agent_id: &AgentId) -> bool {
+            true
+        }
+        fn metadata(&self) -> HashMap<String, String> {
+            HashMap::new()
+        }
+        fn update_reliability(&mut self, _new_reliability: f64) -> Result<()> {
+            Ok(())
+        }
     }
 
     #[derive(Debug)]
     struct MockNetwork;
 
     impl Network for MockNetwork {
-        fn agents(&self) -> Vec<AgentId> { Vec::new() }
-        fn are_connected(&self, _agent1: &AgentId, _agent2: &AgentId) -> bool { false }
-        fn connection_strength(&self, _agent1: &AgentId, _agent2: &AgentId) -> f64 { 0.0 }
-        fn add_agent(&mut self, _agent_id: AgentId) -> Result<()> { Ok(()) }
-        fn remove_agent(&mut self, _agent_id: &AgentId) -> Result<()> { Ok(()) }
-        fn connect_agents(&mut self, _agent1: AgentId, _agent2: AgentId, _strength: f64) -> Result<()> { Ok(()) }
-        fn neighbors(&self, _agent_id: &AgentId) -> Vec<AgentId> { Vec::new() }
+        fn agents(&self) -> Vec<AgentId> {
+            Vec::new()
+        }
+        fn are_connected(&self, _agent1: &AgentId, _agent2: &AgentId) -> bool {
+            false
+        }
+        fn connection_strength(&self, _agent1: &AgentId, _agent2: &AgentId) -> f64 {
+            0.0
+        }
+        fn add_agent(&mut self, _agent_id: AgentId) -> Result<()> {
+            Ok(())
+        }
+        fn remove_agent(&mut self, _agent_id: &AgentId) -> Result<()> {
+            Ok(())
+        }
+        fn connect_agents(
+            &mut self,
+            _agent1: AgentId,
+            _agent2: AgentId,
+            _strength: f64,
+        ) -> Result<()> {
+            Ok(())
+        }
+        fn neighbors(&self, _agent_id: &AgentId) -> Vec<AgentId> {
+            Vec::new()
+        }
         fn network_statistics(&self) -> crate::environment::NetworkStatistics {
             crate::environment::NetworkStatistics {
                 agent_count: 0,
@@ -350,13 +434,35 @@ mod factory_tests {
         type Interaction = String;
 
         #[cfg(feature = "async")]
-        async fn is_interaction_allowed(&self, _initiator: &AgentId, _target: &AgentId, _interaction: &String, _time: SimulationTime) -> Result<bool> { Ok(true) }
+        async fn is_interaction_allowed(
+            &self,
+            _initiator: &AgentId,
+            _target: &AgentId,
+            _interaction: &String,
+            _time: SimulationTime,
+        ) -> Result<bool> {
+            Ok(true)
+        }
 
         #[cfg(not(feature = "async"))]
-        fn is_interaction_allowed(&self, _initiator: &AgentId, _target: &AgentId, _interaction: &String, _time: SimulationTime) -> Result<bool> { Ok(true) }
+        fn is_interaction_allowed(
+            &self,
+            _initiator: &AgentId,
+            _target: &AgentId,
+            _interaction: &String,
+            _time: SimulationTime,
+        ) -> Result<bool> {
+            Ok(true)
+        }
 
         #[cfg(feature = "async")]
-        async fn process_interaction(&self, _initiator: &AgentId, target: &AgentId, _interaction: String, _time: SimulationTime) -> Result<Vec<crate::environment::InteractionEffect>> {
+        async fn process_interaction(
+            &self,
+            _initiator: &AgentId,
+            target: &AgentId,
+            _interaction: String,
+            _time: SimulationTime,
+        ) -> Result<Vec<crate::environment::InteractionEffect>> {
             Ok(vec![crate::environment::InteractionEffect {
                 target_agent: target.clone(),
                 effect_type: "test".to_string(),
@@ -366,7 +472,13 @@ mod factory_tests {
         }
 
         #[cfg(not(feature = "async"))]
-        fn process_interaction(&self, _initiator: &AgentId, target: &AgentId, _interaction: String, _time: SimulationTime) -> Result<Vec<crate::environment::InteractionEffect>> {
+        fn process_interaction(
+            &self,
+            _initiator: &AgentId,
+            target: &AgentId,
+            _interaction: String,
+            _time: SimulationTime,
+        ) -> Result<Vec<crate::environment::InteractionEffect>> {
             Ok(vec![crate::environment::InteractionEffect {
                 target_agent: target.clone(),
                 effect_type: "test".to_string(),
@@ -375,7 +487,9 @@ mod factory_tests {
             }])
         }
 
-        fn interaction_cost(&self, _interaction: &String) -> f64 { 0.0 }
+        fn interaction_cost(&self, _interaction: &String) -> f64 {
+            0.0
+        }
     }
 
     #[derive(Debug)]
@@ -384,14 +498,30 @@ mod factory_tests {
     #[cfg_attr(feature = "async", async_trait)]
     impl ExogenousProcess for MockExogenousProcess {
         #[cfg(feature = "async")]
-        async fn update_environment(&self, _time: SimulationTime) -> Result<Vec<crate::environment::EnvironmentChange>> { Ok(Vec::new()) }
+        async fn update_environment(
+            &self,
+            _time: SimulationTime,
+        ) -> Result<Vec<crate::environment::EnvironmentChange>> {
+            Ok(Vec::new())
+        }
 
         #[cfg(not(feature = "async"))]
-        fn update_environment(&self, _time: SimulationTime) -> Result<Vec<crate::environment::EnvironmentChange>> { Ok(Vec::new()) }
+        fn update_environment(
+            &self,
+            _time: SimulationTime,
+        ) -> Result<Vec<crate::environment::EnvironmentChange>> {
+            Ok(Vec::new())
+        }
 
-        fn is_active(&self, _time: SimulationTime) -> bool { false }
-        fn name(&self) -> &str { "mock" }
-        fn frequency(&self) -> f64 { 0.0 }
+        fn is_active(&self, _time: SimulationTime) -> bool {
+            false
+        }
+        fn name(&self) -> &str {
+            "mock"
+        }
+        fn frequency(&self) -> f64 {
+            0.0
+        }
     }
 
     #[derive(Debug)]
@@ -410,7 +540,11 @@ mod factory_tests {
         type InformationDistorter = ConfirmationBiasDistorter;
 
         #[cfg(feature = "async")]
-        async fn create_agent(&self, agent_id: AgentId, config: &AgentConfig) -> Result<crate::agent::ConsumerAgent<Self::Agent, Self::ChoiceModule>> {
+        async fn create_agent(
+            &self,
+            agent_id: AgentId,
+            config: &AgentConfig,
+        ) -> Result<crate::agent::ConsumerAgent<Self::Agent, Self::ChoiceModule>> {
             let mut attributes = BasicAgentAttributes::new(agent_id);
             for (name, value) in &config.psychological_attributes {
                 attributes = attributes.with_psychological_attribute(name.clone(), *value);
@@ -424,7 +558,11 @@ mod factory_tests {
         }
 
         #[cfg(not(feature = "async"))]
-        fn create_agent(&self, agent_id: AgentId, config: &AgentConfig) -> Result<crate::agent::ConsumerAgent<Self::Agent, Self::ChoiceModule>> {
+        fn create_agent(
+            &self,
+            agent_id: AgentId,
+            config: &AgentConfig,
+        ) -> Result<crate::agent::ConsumerAgent<Self::Agent, Self::ChoiceModule>> {
             let mut attributes = BasicAgentAttributes::new(agent_id);
             for (name, value) in &config.psychological_attributes {
                 attributes = attributes.with_psychological_attribute(name.clone(), *value);
@@ -438,7 +576,11 @@ mod factory_tests {
         }
 
         #[cfg(feature = "async")]
-        async fn create_physical_asset(&self, asset_id: AssetId, config: &PhysicalAssetConfig) -> Result<Self::PhysicalAsset> {
+        async fn create_physical_asset(
+            &self,
+            asset_id: AssetId,
+            config: &PhysicalAssetConfig,
+        ) -> Result<Self::PhysicalAsset> {
             Ok(MockPhysicalAsset {
                 id: asset_id,
                 name: config.name.clone(),
@@ -446,7 +588,11 @@ mod factory_tests {
         }
 
         #[cfg(not(feature = "async"))]
-        fn create_physical_asset(&self, asset_id: AssetId, config: &PhysicalAssetConfig) -> Result<Self::PhysicalAsset> {
+        fn create_physical_asset(
+            &self,
+            asset_id: AssetId,
+            config: &PhysicalAssetConfig,
+        ) -> Result<Self::PhysicalAsset> {
             Ok(MockPhysicalAsset {
                 id: asset_id,
                 name: config.name.clone(),
@@ -454,7 +600,11 @@ mod factory_tests {
         }
 
         #[cfg(feature = "async")]
-        async fn create_knowledge_asset(&self, asset_id: AssetId, config: &KnowledgeAssetConfig) -> Result<Self::KnowledgeAsset> {
+        async fn create_knowledge_asset(
+            &self,
+            asset_id: AssetId,
+            config: &KnowledgeAssetConfig,
+        ) -> Result<Self::KnowledgeAsset> {
             Ok(MockKnowledgeAsset {
                 id: asset_id,
                 content: config.content.clone(),
@@ -462,7 +612,11 @@ mod factory_tests {
         }
 
         #[cfg(not(feature = "async"))]
-        fn create_knowledge_asset(&self, asset_id: AssetId, config: &KnowledgeAssetConfig) -> Result<Self::KnowledgeAsset> {
+        fn create_knowledge_asset(
+            &self,
+            asset_id: AssetId,
+            config: &KnowledgeAssetConfig,
+        ) -> Result<Self::KnowledgeAsset> {
             Ok(MockKnowledgeAsset {
                 id: asset_id,
                 content: config.content.clone(),
@@ -500,7 +654,10 @@ mod factory_tests {
         }
 
         #[cfg(feature = "async")]
-        async fn create_information_filter(&self, _filter_type: &str) -> Result<Self::InformationFilter> {
+        async fn create_information_filter(
+            &self,
+            _filter_type: &str,
+        ) -> Result<Self::InformationFilter> {
             Ok(ReliabilityFilter::new(0.5))
         }
 
@@ -510,12 +667,18 @@ mod factory_tests {
         }
 
         #[cfg(feature = "async")]
-        async fn create_information_distorter(&self, _distorter_type: &str) -> Result<Self::InformationDistorter> {
+        async fn create_information_distorter(
+            &self,
+            _distorter_type: &str,
+        ) -> Result<Self::InformationDistorter> {
             Ok(ConfirmationBiasDistorter::new(0.3))
         }
 
         #[cfg(not(feature = "async"))]
-        fn create_information_distorter(&self, _distorter_type: &str) -> Result<Self::InformationDistorter> {
+        fn create_information_distorter(
+            &self,
+            _distorter_type: &str,
+        ) -> Result<Self::InformationDistorter> {
             Ok(ConfirmationBiasDistorter::new(0.3))
         }
 
@@ -539,8 +702,14 @@ mod factory_tests {
             .with_psychological_attribute("risk_aversion".to_string(), 0.5)
             .with_socioeconomic_attribute("income".to_string(), 50000.0);
 
-        assert_eq!(config.psychological_attributes.get("risk_aversion"), Some(&0.5));
-        assert_eq!(config.socioeconomic_attributes.get("income"), Some(&50000.0));
+        assert_eq!(
+            config.psychological_attributes.get("risk_aversion"),
+            Some(&0.5)
+        );
+        assert_eq!(
+            config.socioeconomic_attributes.get("income"),
+            Some(&50000.0)
+        );
     }
 
     #[test]
@@ -552,7 +721,8 @@ mod factory_tests {
 
     #[test]
     fn test_knowledge_asset_config() {
-        let config = KnowledgeAssetConfig::new("Test content".to_string(), "test_topic".to_string());
+        let config =
+            KnowledgeAssetConfig::new("Test content".to_string(), "test_topic".to_string());
         assert_eq!(config.content, "Test content");
         assert_eq!(config.topic, "test_topic");
         assert_eq!(config.reliability, 1.0);
@@ -563,15 +733,20 @@ mod factory_tests {
     fn test_factory_agent_creation() {
         let factory = TestFactory;
         let agent_id = AgentId::new();
-        let config = AgentConfig::new()
-            .with_psychological_attribute("risk_aversion".to_string(), 0.7);
+        let config =
+            AgentConfig::new().with_psychological_attribute("risk_aversion".to_string(), 0.7);
 
         let result = factory.create_agent(agent_id.clone(), &config);
         assert!(result.is_ok());
 
         let agent = result.unwrap();
         assert_eq!(agent.attributes().agent_id(), &agent_id);
-        assert_eq!(agent.attributes().get_psychological_attribute("risk_aversion"), Some(0.7));
+        assert_eq!(
+            agent
+                .attributes()
+                .get_psychological_attribute("risk_aversion"),
+            Some(0.7)
+        );
     }
 
     #[test]

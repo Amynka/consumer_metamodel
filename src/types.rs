@@ -261,7 +261,10 @@ mod tests {
     #[test]
     fn test_trigger_type_display() {
         assert_eq!(TriggerType::Economic.to_string(), "Economic");
-        assert_eq!(TriggerType::Custom("test".to_string()).to_string(), "Custom(test)");
+        assert_eq!(
+            TriggerType::Custom("test".to_string()).to_string(),
+            "Custom(test)"
+        );
     }
 
     #[test]

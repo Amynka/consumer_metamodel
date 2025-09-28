@@ -77,7 +77,9 @@ pub mod utils;
 
 // Re-export commonly used types and traits
 pub use agent::{AgentAttributes, ChoiceModule, ConsumerAgent};
-pub use environment::{Environment, ExogenousProcess, KnowledgeAsset, Network, PhysicalAsset, RulesOfInteraction};
+pub use environment::{
+    Environment, ExogenousProcess, KnowledgeAsset, Network, PhysicalAsset, RulesOfInteraction,
+};
 pub use factory::ModelComponentFactory;
 pub use information::{InformationDistorter, InformationFilter, Transformer};
 pub use model::ConsumerChoiceModel;
