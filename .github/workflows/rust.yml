@@ -19,4 +19,26 @@ jobs:
     - name: Build
       run: cargo build --verbose
     - name: Run tests
+      if: github.event_name != 'pull_request'
       run: cargo test --verbose
+    
+    - name: Run cargo test
+      if: github.event_name == 'pull_request'
+      id: run_tests
+      run: |
+        set +e
+        cargo test --quiet > result.log
+        echo "TEST_RESULT<<EOF" >> $GITHUB_ENV
+        cat result.log >> $GITHUB_ENV
+        echo "EOF" >> $GITHUB_ENV
+        set -e
+
+    - name: Comment on PR
+      uses: marocchino/sticky-pull-request-comment@v2
+      if: github.event_name == 'pull_request'
+      with:
+        message: |
+          🧪 **Cargo Test Results**
+          ```
+          ${{ env.TEST_RESULT }}
+
