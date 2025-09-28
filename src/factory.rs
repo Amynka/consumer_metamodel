@@ -6,7 +6,7 @@ use crate::environment::{
 };
 use crate::information::{InformationDistorter, InformationFilter};
 use crate::types::{AgentId, AssetId, SimulationTime};
-use crate::{Error, Result};
+use crate::Result;
 use std::collections::HashMap;
 
 #[cfg(feature = "async")]

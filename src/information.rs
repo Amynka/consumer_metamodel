@@ -1,7 +1,7 @@
 //! Information processing traits and types for the Consumer Choice Metamodel
 
 use crate::types::{AgentId, SimulationTime};
-use crate::{Error, Result};
+use crate::Result;
 use std::collections::HashMap;
 
 #[cfg(feature = "async")]
